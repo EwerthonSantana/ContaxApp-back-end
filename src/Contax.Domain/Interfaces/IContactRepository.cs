@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using Contax.Domain.Entities;
 
 namespace Contax.Domain.Interfaces;
@@ -10,4 +9,5 @@ public interface IContactRepository
     Task AddAsync(Contact contact);
     Task UpdateAsync(Contact contact);
     Task DeleteAsync(Contact contact);
+    Task<bool> ExistsByPhoneAsync(string phone, Guid? excludeId = null);
 }

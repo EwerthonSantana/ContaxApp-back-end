@@ -1,6 +1,3 @@
-// Contax.Api/Controllers/ContatosController.cs
-using System;
-using System.Threading.Tasks;
 using Contax.Application.Contacts.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -64,7 +61,7 @@ public class ContactsController : ControllerBase
             return NotFound("Contato não encontrado para atualização.");
         }
 
-        return NoContent(); // 204 Sucesso sem conteúdo
+        return NoContent();
     }
 
     // DELETE
@@ -79,6 +76,6 @@ public class ContactsController : ControllerBase
             return NotFound("Contato não encontrado para exclusão.");
         }
 
-        return NoContent(); // 204 Sucesso sem conteúdo
+        return NoContent();
     }
 }

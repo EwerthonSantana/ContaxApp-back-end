@@ -22,12 +22,11 @@ public class AppDbContext : DbContext
             builder.Property(u => u.PasswordHash).IsRequired().HasMaxLength(512);
             builder.Property(u => u.Role).IsRequired().HasMaxLength(50);
 
-            // Garante que o Username seja único
             builder.HasIndex(u => u.Username).IsUnique();
             builder.ToTable("Users");
         });
 
-        string adminPasswordHash = "$2a$12$wEkPcsAcc2fFelvm560eF.5cdj.OxU8HDWWVa/xxM0oStkbiESZZK"; // Hash para "seila123"
+        string adminPasswordHash = "$2a$12$wEkPcsAcc2fFelvm560eF.5cdj.OxU8HDWWVa/xxM0oStkbiESZZK";
 
         modelBuilder
             .Entity<User>()

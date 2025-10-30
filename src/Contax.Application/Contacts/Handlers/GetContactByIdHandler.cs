@@ -1,17 +1,19 @@
 // Agenda.Application/Handlers/GetContactByIdHandler.cs
+using System.Data;
 using AutoMapper;
 using Contax.Domain.Entities;
 using Contax.Domain.Interfaces;
+using Dapper;
 using MediatR;
 
 public class GetContactByIdHandler : IRequestHandler<GetContactByIdQuery, ContactDTO>
 {
-    private readonly IContactRepository _repository;
+    private readonly IDbConnection _dbConnection;
     private readonly IMapper _mapper;
 
-    public GetContactByIdHandler(IContactRepository repository, IMapper mapper)
+    public GetContactByIdHandler(IDbConnection dbConnection, IMapper mapper)
     {
-        _repository = repository;
+        _dbConnection = dbConnection;
         _mapper = mapper;
     }
 
@@ -20,7 +22,12 @@ public class GetContactByIdHandler : IRequestHandler<GetContactByIdQuery, Contac
         CancellationToken cancellationToken
     )
     {
-        var Contact = await _repository.GetByIdAsync(request.Id);
+        const string sql =
+            "SELECT \"Id\", \"Name\", \"Email\", \"Phone\" FROM \"Contacts\" WHERE \"Id\" = @Id";
+        var Contact = await _dbConnection.QuerySingleOrDefaultAsync<Contact>(
+            sql,
+            new { request.Id }
+        );
 
         return _mapper.Map<ContactDTO>(Contact);
     }

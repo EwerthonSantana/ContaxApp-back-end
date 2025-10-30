@@ -1,18 +1,21 @@
 using System.Collections.Generic;
+using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
+using Contax.Domain.Entities; // NOVO
 using Contax.Domain.Interfaces;
+using Dapper;
 using MediatR;
 
-public class GetAllContactsHandler : IRequestHandler<GetAllContactsQuery, IEnumerable<ContactDTO>>
+public class GetAllContactHandler : IRequestHandler<GetAllContactsQuery, IEnumerable<ContactDTO>>
 {
-    private readonly IContactRepository _repository;
+    private readonly IDbConnection _dbConnection;
     private readonly IMapper _mapper;
 
-    public GetAllContactsHandler(IContactRepository repository, IMapper mapper)
+    public GetAllContactHandler(IDbConnection dbConnection, IMapper mapper)
     {
-        _repository = repository;
+        _dbConnection = dbConnection;
         _mapper = mapper;
     }
 
@@ -21,9 +24,11 @@ public class GetAllContactsHandler : IRequestHandler<GetAllContactsQuery, IEnume
         CancellationToken cancellationToken
     )
     {
-        var contacts = await _repository.GetAllAsync();
+        const string sql =
+            "SELECT \"Id\", \"Name\", \"Email\", \"Phone\" FROM \"Contacts\" ORDER BY \"Name\"";
 
-        // Mapeia a lista de Entidades para uma lista de DTOs
+        var contacts = await _dbConnection.QueryAsync<Contact>(sql);
+
         return _mapper.Map<IEnumerable<ContactDTO>>(contacts);
     }
 }

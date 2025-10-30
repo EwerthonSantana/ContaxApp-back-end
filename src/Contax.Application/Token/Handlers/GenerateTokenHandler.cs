@@ -1,11 +1,9 @@
-// Contax.Application/Handlers/GenerateTokenHandler.cs
-// ...
 using MediatR;
 
 public class GenerateTokenHandler : IRequestHandler<GenerateTokenQuery, string>
 {
     private readonly ITokenService _tokenService;
-    private readonly IUserRepository _userRepository; // NOVO: Injeção do Repositório
+    private readonly IUserRepository _userRepository;
 
     public GenerateTokenHandler(ITokenService tokenService, IUserRepository userRepository)
     {
@@ -18,7 +16,6 @@ public class GenerateTokenHandler : IRequestHandler<GenerateTokenQuery, string>
         CancellationToken cancellationToken
     )
     {
-        // 1. Busca o usuário no repositório (DB)
         var user = await _userRepository.GetUserByUsernameAsync(request.Username);
 
         if (user == null)
@@ -26,7 +23,6 @@ public class GenerateTokenHandler : IRequestHandler<GenerateTokenQuery, string>
             throw new UnauthorizedAccessException("Credenciais inválidas.");
         }
 
-        // 2. Valida a senha (Regra de Negócio)
         var passwordIsValid = await _userRepository.ValidatePasswordAsync(
             request.Password,
             user.PasswordHash
@@ -37,7 +33,6 @@ public class GenerateTokenHandler : IRequestHandler<GenerateTokenQuery, string>
             throw new UnauthorizedAccessException("Credenciais inválidas.");
         }
 
-        // 3. Geração do Token com a Role
         var token = _tokenService.GenerateToken(user.Username, user.Role);
 
         return token;

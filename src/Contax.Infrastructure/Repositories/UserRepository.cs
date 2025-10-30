@@ -1,4 +1,3 @@
-// Contax.Infrastructure/Repositories/UserRepository.cs
 using Contax.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 

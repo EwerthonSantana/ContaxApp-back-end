@@ -11,7 +11,11 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddInfrastructure(builder.Configuration);
 
     // 2. Outros Serviços
-    builder.Services.AddControllers();
+    builder.Services.AddControllers(options =>
+    {
+        // NOVO: Adiciona o filtro para tratar a exceção de validação
+        options.Filters.Add<ValidationExceptionFilter>();
+    });
     builder.Services.AddEndpointsApiExplorer();
 
     // 3. Swagger
@@ -35,6 +39,7 @@ var builder = WebApplication.CreateBuilder(args);
     var jwtKey =
         builder.Configuration["Jwt:Key"]
         ?? throw new InvalidOperationException("Jwt:Key não configurada em appsettings.json.");
+
     var key = Encoding.ASCII.GetBytes(jwtKey);
 
     builder

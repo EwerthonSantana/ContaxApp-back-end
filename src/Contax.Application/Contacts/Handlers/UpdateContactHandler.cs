@@ -1,7 +1,6 @@
-// Contax.Application/Handlers/UpdateContactHandler.cs
-using System.Threading;
-using System.Threading.Tasks;
 using Contax.Domain.Interfaces;
+using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 
 public class UpdateContactHandler : IRequestHandler<UpdateContactCommand, bool>
@@ -22,11 +21,28 @@ public class UpdateContactHandler : IRequestHandler<UpdateContactCommand, bool>
 
         if (contact == null)
         {
-            return false; // Ou lançar uma exceção de "Não Encontrado"
+            return false;
         }
 
-        // Chamando o método de domínio para atualizar o estado da Entidade (DDD)
-        contact.Update(request.Name, request.Email, request.Phone);
+        string normalizedPhone = PhoneNumberUtility.Normalize(request.Phone);
+
+        // 3. REGRA DE NEGÓCIO: Validação de Unicidade
+        // 🚨 Ponto CRÍTICO: Passamos o ID do contato atual (request.Id).
+        // A implementação no Repositório irá gerar: WHERE Phone = @normalizedPhone AND Id != @request.Id
+        if (await _repository.ExistsByPhoneAsync(normalizedPhone, request.Id))
+        {
+            throw new ValidationException(
+                "Validation failed",
+                [
+                    new ValidationFailure(
+                        "Phone",
+                        "Este número de telefone já está sendo usado por outro contato no sistema."
+                    ),
+                ]
+            );
+        }
+
+        contact.Update(request.Name, request.Email, normalizedPhone);
 
         await _repository.UpdateAsync(contact);
 

@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using Contax.Domain.Entities;
 using Contax.Domain.Interfaces;
 using Contax.Infrastructure.Persistence;
@@ -6,17 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Contax.Infrastructure.Repositories;
 
-// Agenda.Infrastructure/Repositories/ContatoRepository.cs
 public class ContactRepository : IContactRepository
 {
     private readonly AppDbContext _context;
 
-    // Opcional: private readonly IDbConnection _dapperConnection;
-
-    public ContactRepository(AppDbContext context) //, IDbConnection dapperConnection
+    public ContactRepository(AppDbContext context)
     {
         _context = context;
-        // _dapperConnection = dapperConnection;
     }
 
     public async Task AddAsync(Contact contato)
@@ -27,28 +22,38 @@ public class ContactRepository : IContactRepository
 
     public Task DeleteAsync(Contact contact)
     {
-        throw new NotImplementedException();
+        _context.Contacts.Remove(contact);
+        return _context.SaveChangesAsync();
     }
 
-    public Task<IEnumerable<Contact>> GetAllAsync()
+    public async Task<IEnumerable<Contact>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        return await _context.Contacts.AsNoTracking().OrderBy(c => c.Name).ToListAsync();
     }
 
     public async Task<Contact> GetByIdAsync(Guid id)
     {
-        // Exemplo Dapper (Opcional: para Read Model em CQRS)
-        // var sql = "SELECT * FROM Contatos WHERE Id = @Id";
-        // return await _dapperConnection.QuerySingleOrDefaultAsync<Contato>(sql, new { Id = id });
+        var contact = await _context.Contacts.FindAsync(id);
 
-        // Exemplo EF Core (Pode ser usado para Write Model)
-        return await _context.Contacts.FindAsync(id);
+        return contact;
     }
 
-    public Task UpdateAsync(Contact contact)
+    public async Task UpdateAsync(Contact contact)
     {
-        throw new NotImplementedException();
+        _context.Contacts.Update(contact);
+
+        await _context.SaveChangesAsync();
     }
 
-    // ... Implementar GetAllAsync, UpdateAsync, DeleteAsync usando _context
+    public async Task<bool> ExistsByPhoneAsync(string phone, Guid? excludeId = null)
+    {
+        var query = _context.Contacts.AsNoTracking().Where(c => c.Phone == phone);
+
+        if (excludeId.HasValue)
+        {
+            query = query.Where(c => c.Id != excludeId.Value);
+        }
+
+        return await query.AnyAsync();
+    }
 }

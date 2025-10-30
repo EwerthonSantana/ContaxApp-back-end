@@ -1,12 +1,9 @@
-// Contax.Api/Controllers/AuthController.cs
-
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity.Data; // Certifique-se que este using está correto
 using Microsoft.AspNetCore.Mvc;
 
-[ApiController] // ESSENCIAL: Identifica a classe como um Controller de API
-[Route("api/[controller]")] // ESSENCIAL: Define a rota base como /api/auth
+[ApiController]
+[Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -16,8 +13,8 @@ public class AuthController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpPost("login")] // ESSENCIAL: Define o método HTTP e a sub-rota /login
-    [AllowAnonymous] // Permite que este método seja chamado sem token
+    [HttpPost("login")]
+    [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
         try
@@ -33,7 +30,6 @@ public class AuthController : ControllerBase
         }
         catch (Exception ex)
         {
-            // Opcional: Logar o erro completo aqui
             return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
         }
     }
