@@ -1,18 +1,21 @@
+using AutoMapper;
 using Contax.Domain.Interfaces;
 using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
 
-public class UpdateContactHandler : IRequestHandler<UpdateContactCommand, bool>
+public class UpdateContactHandler : IRequestHandler<UpdateContactCommand, ContactDTO>
 {
     private readonly IContactRepository _repository;
+    private readonly IMapper _mapper;
 
-    public UpdateContactHandler(IContactRepository repository)
+    public UpdateContactHandler(IContactRepository repository, IMapper mapper)
     {
         _repository = repository;
+        _mapper = mapper;
     }
 
-    public async Task<bool> Handle(
+    public async Task<ContactDTO> Handle(
         UpdateContactCommand request,
         CancellationToken cancellationToken
     )
@@ -21,7 +24,7 @@ public class UpdateContactHandler : IRequestHandler<UpdateContactCommand, bool>
 
         if (contact == null)
         {
-            return false;
+            return null;
         }
 
         string normalizedPhone = PhoneNumberUtility.Normalize(request.Phone);
@@ -46,6 +49,6 @@ public class UpdateContactHandler : IRequestHandler<UpdateContactCommand, bool>
 
         await _repository.UpdateAsync(contact);
 
-        return true;
+        return _mapper.Map<ContactDTO>(contact);
     }
 }

@@ -56,12 +56,12 @@ public class ContactsController : ControllerBase
 
         var result = await _mediator.Send(command);
 
-        if (!result)
+        if (result == null)
         {
             return NotFound("Contato não encontrado para atualização.");
         }
 
-        return NoContent();
+        return Ok(result);
     }
 
     // DELETE

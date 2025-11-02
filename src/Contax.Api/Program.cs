@@ -1,11 +1,13 @@
-// Agenda.Api/Program.cs
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
+var MyAllowSpecificOrigins = "_myVueAppOrigins";
 var builder = WebApplication.CreateBuilder(args);
 {
+
+
     // 1. Configurações da Aplicação e Infraestrutura
     builder.Services.AddApplication();
     builder.Services.AddInfrastructure(builder.Configuration);
@@ -33,6 +35,23 @@ var builder = WebApplication.CreateBuilder(args);
                 Scheme = "Bearer",
             }
         );
+    });
+
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy(name: MyAllowSpecificOrigins,
+                          policy =>
+                          {
+                              // ** MUITO IMPORTANTE: Defina a URL do seu frontend Vue **
+                              policy.WithOrigins("http://localhost:5173")
+                                    // Permite todos os métodos HTTP (GET, POST, PUT, DELETE, OPTIONS)
+                                    .AllowAnyMethod()
+                                    // Permite todos os cabeçalhos de requisição (necessário para Authorization)
+                                    .AllowAnyHeader()
+                                    // Permite o envio de credenciais (cookies, headers de autenticação, etc.)
+                                    // ESSENCIAL para JWT/Tokens de autenticação
+                                    .AllowCredentials();
+                          });
     });
 
     // Configuração JWT (Lê a chave secreta)
@@ -75,7 +94,7 @@ var app = builder.Build();
     }
 
     app.UseHttpsRedirection();
-
+    app.UseCors(MyAllowSpecificOrigins); // <-- AQUI!
     app.UseAuthentication();
     app.UseAuthorization();
 

@@ -3,6 +3,8 @@ using FluentValidation;
 
 public class UpdateContactCommandValidator : AbstractValidator<UpdateContactCommand>
 {
+    private const string StrictEmailRegex = @"^[^@\s]+@[^@\s]+\.[^@\s]{2,}$";
+
     public UpdateContactCommandValidator()
     {
         RuleFor(x => x.Id)
@@ -20,8 +22,8 @@ public class UpdateContactCommandValidator : AbstractValidator<UpdateContactComm
         RuleFor(x => x.Email)
             .NotEmpty()
             .WithMessage("O email é obrigatório.")
-            .EmailAddress()
-            .WithMessage("O email deve ser válido.");
+             .Matches(StrictEmailRegex)
+            .WithMessage("O email deve ser um endereço válido (ex: usuario@dominio.com)."); RuleFor(x => x.Phone);
 
         RuleFor(x => x.Phone)
             .NotEmpty()

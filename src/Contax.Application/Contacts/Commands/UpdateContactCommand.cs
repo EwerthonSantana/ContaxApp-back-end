@@ -1,6 +1,6 @@
 using MediatR;
 
-public class UpdateContactCommand : IRequest<bool>
+public class UpdateContactCommand : IRequest<ContactDTO>
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
