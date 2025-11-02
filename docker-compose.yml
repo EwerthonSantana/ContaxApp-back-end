@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  # Serviço da API .NET
+  api:
+    image: contax_api:latest
+    build:
+      context: .
+      dockerfile: Dockerfile # Usa o Dockerfile atualizado
+    container_name: contax-api-container
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      # A API usa o nome do serviço 'db' para se conectar ao PostgreSQL
+      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=contaxdb;Username=postgree;Password=seila123"
+      Jwt__Key: "dcd595086d344af278425b8c58eebae3"
+      ASPNETCORE_URLS: http://+:8080
+    networks:
+      - contax-network
+
+  # Serviço do Banco de Dados PostgreSQL
+  db:
+    image: postgres:latest
+    container_name: contax-postgres-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - contax-network
+
+# Redes e Volumes
+networks:
+  contax-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
