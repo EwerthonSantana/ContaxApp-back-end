@@ -1,4 +1,5 @@
 using System.Text;
+using Contax.Infrastructure.Data;
 using Contax.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 // 1. Configurações da Aplicação e Infraestrutura
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddScoped<DatabaseSeeder>();
 
 // 2. Outros Serviços
 builder.Services.AddControllers(options =>
@@ -86,11 +88,13 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+// Program.cs
+
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    // Esta linha verifica e aplica quaisquer migrações pendentes
-    dbContext.Database.Migrate();
+    var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
+    // Apenas chame o Seeder. Ele é responsável por verificar e migrar primeiro.
+    await seeder.SeedDataAsync();
 }
 
 if (app.Environment.IsDevelopment())
