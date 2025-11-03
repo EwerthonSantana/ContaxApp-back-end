@@ -1,0 +1,13 @@
+# .dockerignore
+# Ignora pastas de build
+bin/
+obj/
+
+# Ignora pastas de cache NuGet e Visual Studio
+.vs/
+.vscode/
+.git/
+.nuget/
+
+# Ignora o pacote de teste gerado pelo MSBuild
+**/*.nupkg
