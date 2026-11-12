@@ -1,87 +1,87 @@
-# ⚙️ Contax-API | Sistema de Gestão de Contatos
+# ⚙️ Contax-API | Contact Management System
 
-**(Backend .NET 9 Web API em DDD, CQRS e Dapper)**
+**(.NET 9 Web API with DDD, CQRS, and Dapper)**
 
-> Aplicação backend robusta para o sistema de gestão de contatos. Esta arquitetura utiliza o padrão **CQRS** para separação de responsabilidades e **Dapper** para consultas otimizadas de alto desempenho.
-
----
-
-## 🏗️ Arquitetura & Tecnologias
-
-Este projeto segue o padrão **Domain-Driven Design (DDD)**, com uma implementação de **CQRS (Command Query Responsibility Segregation)** e uma forte separação de responsabilidades nas camadas:
-
-### Padrões e Bibliotecas Principais
-
-| Categoria          | Tecnologia / Padrão       | Uso                                                                                     |
-| :----------------- | :------------------------ | :-------------------------------------------------------------------------------------- |
-| **Arquitetura**    | **CQRS**                  | Separação lógica entre Comandos (escrita/mutação) e Queries (leitura/consulta).         |
-| **ORM de Escrita** | **Entity Framework Core** | Utilizado para operações de Comando (escrita) e gestão de Migrations.                   |
-| **ORM de Leitura** | **Dapper**                | Utilizado para operações de Query (leitura) de alto desempenho e consultas SQL diretas. |
-| **Mapeamento**     | **AutoMapper**            | Mapeamento automatizado entre Entidades, DTOs e ViewModels.                             |
-| **Validação**      | **FluentValidation**      | Definição de regras de validação claras e separadas para Comandos e Queries.            |
-| **Documentação**   | **Swagger/OpenAPI**       | Documentação e testes interativos dos endpoints da API.                                 |
-| **Banco de Dados** | PostgreSQL                | Armazenamento de dados transacionais.                                                   |
-
-### Camadas do Projeto (DDD)
-
-- **Contax.Domain** | Contém Entidades, Agregados, Repositórios e Regras de Negócio.
-- **Contax.Application** | Contém Lógica de Aplicação, **Comandos** (Criação, Edição), **Queries** (Consulta), Handlers e DTOs.
-- **Contax.Infrastructure** | Implementação do EF Core, Repositórios, Conexão Dapper e serviços de infraestrutura.
-- **Contax.Api** | Ponto de entrada, Controllers, Configuração de Injeção de Dependência e CORS.
+> Robust back end for the contact management system. The architecture uses the **CQRS** pattern for separation of concerns and **Dapper** for optimized, high-performance queries.
 
 ---
 
-## 🔑 Configuração e Execução (Com Docker)
+## 🏗️ Architecture & Technologies
 
-O projeto é orquestrado via Docker Compose, que inicializa a API (.NET), o PostgreSQL e aplica as Migrações do EF Core no startup.
+This project follows **Domain-Driven Design (DDD)**, with a **CQRS (Command Query Responsibility Segregation)** implementation and a strong separation of concerns across layers:
 
-### Pré-Requisitos
+### Main Patterns and Libraries
 
-- **Docker** e **Docker Compose**
-- **Rede Compartilhada:** Crie a rede global para comunicação com o Frontend: `docker network create minha_rede_global`
+| Category          | Technology / Pattern      | Usage                                                                                    |
+| :---------------- | :------------------------ | :--------------------------------------------------------------------------------------- |
+| **Architecture**  | **CQRS**                  | Logical separation between Commands (writes/mutations) and Queries (reads).              |
+| **Write ORM**     | **Entity Framework Core** | Used for Command (write) operations and migration management.                            |
+| **Read ORM**      | **Dapper**                | Used for high-performance Query (read) operations and direct SQL queries.                |
+| **Mapping**       | **AutoMapper**            | Automated mapping between Entities, DTOs, and ViewModels.                                |
+| **Validation**    | **FluentValidation**      | Clear, separate validation rules for Commands and Queries.                               |
+| **Documentation** | **Swagger/OpenAPI**       | Interactive documentation and testing of the API endpoints.                              |
+| **Database**      | PostgreSQL                | Transactional data storage.                                                              |
 
-### 1. Subir o Backend e o Banco de Dados
+### Project Layers (DDD)
 
-1.  Navegue até o diretório deste projeto (`Contax-Api`).
-2.  Execute o comando para subir todos os serviços:
+- **Contax.Domain** | Entities, Aggregates, Repositories, and Business Rules.
+- **Contax.Application** | Application Logic, **Commands** (Create, Update), **Queries** (Read), Handlers, and DTOs.
+- **Contax.Infrastructure** | EF Core implementation, Repositories, Dapper connection, and infrastructure services.
+- **Contax.Api** | Entry point, Controllers, Dependency Injection setup, and CORS.
+
+---
+
+## 🔑 Setup and Running (with Docker)
+
+The project is orchestrated with Docker Compose, which starts the API (.NET) and PostgreSQL and applies the EF Core migrations on startup.
+
+### Prerequisites
+
+- **Docker** and **Docker Compose**
+- **Shared network:** create the global network used to communicate with the front end: `docker network create minha_rede_global`
+
+### 1. Start the Back End and the Database
+
+1.  Go to this project's directory (`Contax-Api`).
+2.  Run the command to start all services:
 
     ```bash
     docker-compose up -d --build
     ```
 
-    > **Nota:** As Migrações do EF Core e a injeção do Dapper são configuradas para ocorrer no startup do contêiner da API.
+    > **Note:** EF Core migrations and the Dapper setup run when the API container starts.
 
-### Acesso e Verificação
+### Access and Verification
 
-- **Documentação (Swagger):** O principal ponto de acesso para testar seus comandos e queries.
+- **Documentation (Swagger):** the main entry point for testing commands and queries.
   - URL: **[http://localhost:8081/swagger](http://localhost:8081/swagger)**
-- **Backend Status:** API escutando em `localhost:8081`.
+- **Back-end status:** the API listens on `localhost:8081`.
 
 ---
 
-## 🛠️ Detalhes da Implementação CQRS
+## 🛠️ CQRS Implementation Details
 
-A camada de Aplicação (`Contax.Application`) está estruturada para receber:
+The Application layer (`Contax.Application`) is structured to handle:
 
-- **Comandos (`Commands`):** Tratados por Handlers que utilizam o **EF Core** para persistência transacional.
-- **Queries (`Queries`):** Tratadas por Handlers que utilizam o **Dapper** para executar consultas SQL otimizadas diretamente no banco de dados, retornando DTOs específicos de leitura.
+- **Commands (`Commands`):** processed by Handlers that use **EF Core** for transactional persistence.
+- **Queries (`Queries`):** processed by Handlers that use **Dapper** to run optimized SQL queries directly against the database, returning read-specific DTOs.
 
-### Variáveis de Ambiente
+### Environment Variables
 
-As configurações de DB e segurança são injetadas via `docker-compose.yml`.
+Database and security settings are injected via `docker-compose.yml`.
 
-| Variável                               | Valor                              | Uso                                             |
-| :------------------------------------- | :--------------------------------- | :---------------------------------------------- |
-| `ConnectionStrings__DefaultConnection` | `Host=db;...`                      | Conexão principal (usada pelo EF Core).         |
-| `ConnectionStrings__DapperConnection`  | `Host=db;...`                      | Conexão para as Queries (usada pelo Dapper).    |
-| `Jwt__Key`                             | `dcd595086d344af278425b8c58eebae3` | Chave secreta para geração e validação de JWTs. |
-
----
-
-## 📄 Licença
-
-Este projeto está licenciado sob a Licença MIT.
+| Variable                               | Value                   | Usage                                           |
+| :------------------------------------- | :---------------------- | :---------------------------------------------- |
+| `ConnectionStrings__DefaultConnection` | `Host=db;...`           | Main connection (used by EF Core).              |
+| `ConnectionStrings__DapperConnection`  | `Host=db;...`           | Connection for Queries (used by Dapper).        |
+| `Jwt__Key`                             | `<your-secret-key>`     | Secret key used to sign and validate JWTs.      |
 
 ---
 
-**Autor:** Ewerthon Santana/https://github.com/EwerthonSantana/https://www.linkedin.com/in/ewerthonsantana/
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+**Author:** Ewerthon Santana · [GitHub](https://github.com/EwerthonSantana) · [LinkedIn](https://www.linkedin.com/in/ewerthonsantana/)
